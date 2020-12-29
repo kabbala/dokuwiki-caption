@@ -64,6 +64,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addPattern('<caption>(?=.*</caption>)','plugin_caption_caption');
         $this->Lexer->addPattern('<figcaption>(?=.*</figcaption>)','plugin_caption_caption');
         $this->Lexer->addPattern('</caption>','plugin_caption_caption');
+        $this->Lexer->addPattern('</figcaption>','plugin_caption_caption');
     }
 
     public function postConnect() {
@@ -98,7 +99,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         $this->_type = $match;
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<div class="figure"';
+                                $renderer->doc .= '<figure class="figure"';
                                 // If we have a label, assign it to the global label array
                                 if ($label) {
                                     global $caption_labels;
@@ -139,10 +140,9 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     // return the dokuwiki markup within the caption tags
                     if (!$this->_incaption) {
                         $this->_incaption = true;
-                        $renderer->doc .= '<div class="caption">';
                         switch ($this->_type) {
                             case "figure" :
-                                $renderer->doc .= '<span class="captionno"';
+                                $renderer->doc .= '<figcaption class="caption"><span class="captionno"';
                                 if(array_key_exists($this->_fignum,$this->_figlabels)) {
                                     $renderer->doc .= ' title="'
                                                         .$this->_figlabels[$this->_fignum].'"';
@@ -157,7 +157,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                                 $renderer->doc .= ' <span class="captiontext">';
                                 break;
                             case "table" :
-                                $renderer->doc .= '<span class="captionno"';
+                                $renderer->doc .= '<div class="caption"><span class="captionno"';
                                 if(array_key_exists($this->_tabnum,$this->_tablabels)) {
                                     $renderer->doc .= ' title="'
                                                         .$this->_tablabels[$this->_tabnum].'"';
@@ -174,7 +174,14 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                         }
                     } else {
                         $this->_incaption = false;
-                        $renderer->doc .= '</span></div>';
+                        switch ($this->_type) {
+                            case "figure" :
+                                $renderer->doc .= '</span></figcaption>';
+                                break;
+                            case "table" :
+                                $renderer->doc .= '</span></div>';
+                                break;
+                        }
                     }
                     break;
 
@@ -188,13 +195,14 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
                     switch ($this->_type) {
                         case "figure" :
                             $this->_fignum++;
+                            $renderer->doc .= '</figure>';
                             break;
                         case "table" :
                             $this->_tabnum++;
+                            $renderer->doc .= '</div>';
                             break;
                     }
                     $this->_type = '';
-                    $renderer->doc .= '</div>';
                     break;
             }
             return true;
