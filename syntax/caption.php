@@ -62,6 +62,7 @@ class syntax_plugin_caption_caption extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addEntryPattern('<figure.*?>(?=.*</figure>)',$mode,'plugin_caption_caption');
         $this->Lexer->addEntryPattern('<table.*?>(?=.*</table>)',$mode,'plugin_caption_caption');
         $this->Lexer->addPattern('<caption>(?=.*</caption>)','plugin_caption_caption');
+        $this->Lexer->addPattern('<figcaption>(?=.*</figcaption>)','plugin_caption_caption');
         $this->Lexer->addPattern('</caption>','plugin_caption_caption');
     }
 
